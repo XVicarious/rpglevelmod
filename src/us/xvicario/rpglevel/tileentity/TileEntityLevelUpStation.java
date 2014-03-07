@@ -1,7 +1,5 @@
 package us.xvicario.rpglevel.tileentity;
 
-import java.util.Random;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemBook;
@@ -11,19 +9,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityLevelUpStation extends TileEntity implements IInventory {
-	private static final float PI = 3.14159F;
 	private ItemStack[] inv;
-	public float bookSpreadPrev;
-	public float bookSpread;
-	public float bookRotationPreview;
-	public float bookRotation2;
-	public float bookRotation;
-	public float somethingOrOther;
-	public float somethingOrOther2;
-	public float pageFlip;
-	public float pageFlipPrev;
-	public int tickCount;
-	private static Random rand = new Random();
 
 	public TileEntityLevelUpStation() {
 		this.inv = new ItemStack[9];

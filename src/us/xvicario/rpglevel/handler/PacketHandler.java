@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetworkManager;
 import net.minecraft.network.packet.Packet250CustomPayload;
+import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.DimensionManager;
 import us.xvicario.rpglevel.RPGLevel;
 import us.xvicario.rpglevel.tileentity.TileEntityLevelUpStation;
@@ -43,6 +44,7 @@ public class PacketHandler implements IPacketHandler {
 				}
 			}
 			this.player.destroyCurrentEquippedItem();
+			this.player.attackEntityFrom(DamageSource.magic, 2);
 			this.player.addExperienceLevel(-RPGLevel.requiredLevels);
 		} catch (IOException e) {
 			RPGLevel.log.info("Failed to send last packet! This isn't good!");

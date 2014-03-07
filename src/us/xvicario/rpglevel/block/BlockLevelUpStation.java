@@ -5,16 +5,13 @@ import java.io.DataOutputStream;
 import java.util.Random;
 
 import us.xvicario.rpglevel.RPGLevel;
-import us.xvicario.rpglevel.client.gui.LevelUpStationGUI;
 import us.xvicario.rpglevel.tileentity.TileEntityLevelUpStation;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBook;
 import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
@@ -22,7 +19,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import cpw.mods.fml.common.network.FMLNetworkHandler;
 import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -82,10 +78,12 @@ public BlockLevelUpStation(int par1, Material par2Material, boolean active) {
 	
 	private void doPacketForSkill(BiomeGenBase biome , EntityPlayer player, Type type, Item item) {
 		if (BiomeDictionary.isBiomeOfType(biome, type)) {
-			if (player.getHeldItem() != null) {
-				if (player.getHeldItem().getItem() == item) {
-					actionPerformed(1);
-					player.addChatMessage("You had an " + item.getUnlocalizedName() +"!");
+			if (player.experienceLevel >= RPGLevel.requiredLevels) {
+				if (player.getHeldItem() != null) {
+					if (player.getHeldItem().getItem() == item) {
+						actionPerformed(1);
+						player.addChatMessage("You had an " + item.getUnlocalizedName() +"!");
+					}
 				}
 			}
 		}
