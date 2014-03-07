@@ -1,19 +1,29 @@
 package us.xvicario.rpglevel.block;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.util.Random;
 
 import us.xvicario.rpglevel.RPGLevel;
+import us.xvicario.rpglevel.client.gui.LevelUpStationGUI;
 import us.xvicario.rpglevel.tileentity.TileEntityLevelUpStation;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.texture.IconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBook;
+import net.minecraft.network.packet.Packet250CustomPayload;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Icon;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeDictionary.Type;
 import cpw.mods.fml.common.network.FMLNetworkHandler;
+import cpw.mods.fml.common.network.PacketDispatcher;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
@@ -22,7 +32,7 @@ public class BlockLevelUpStation extends BlockContainer {
 	private Icon bottomIcon;
 	private Icon sideIcon;
 
-	public BlockLevelUpStation(int par1, Material par2Material, boolean active) {
+public BlockLevelUpStation(int par1, Material par2Material, boolean active) {
 		super(par1, par2Material);
 		this.setHardness(10.1F);
 		this.setBlockBounds(0.0f, 0.0f, 0.0f, 1.0f, 0.75f, 1.0f);
@@ -61,17 +71,43 @@ public class BlockLevelUpStation extends BlockContainer {
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitX, float hitY, float hitZ) {
 		if (!world.isRemote && isMultiBlockStructure(world,x+1,y,z+1)) {
+			BiomeGenBase biome = world.getWorldChunkManager().getBiomeGenAt(x, z);
+			doPacketForSkill(biome,player,Type.MOUNTAIN,Item.pickaxeIron);
+			doPacketForSkill(biome,player,Type.FOREST,Item.axeIron);
+			doPacketForSkill(biome,player,Type.FOREST,Item.bow);
+			
+		}
+		return true;
+	}
+	
+	private void doPacketForSkill(BiomeGenBase biome , EntityPlayer player, Type type, Item item) {
+		if (BiomeDictionary.isBiomeOfType(biome, type)) {
 			if (player.getHeldItem() != null) {
-				if (player.getHeldItem().getItem() == Item.pickaxeIron) {
-					player.destroyCurrentEquippedItem();
-					for (int i = 0; i < 20; i++) {
-						player.addExperienceLevel(-1);
-					}
-					player.addChatMessage("You had an Iron Pickaxe!");
+				if (player.getHeldItem().getItem() == item) {
+					actionPerformed(1);
+					player.addChatMessage("You had an " + item.getUnlocalizedName() +"!");
 				}
 			}
 		}
-		return true;
+	}
+	
+	private void actionPerformed(int skill) {
+		boolean flag = false;
+		if (flag == false) {
+			ByteArrayOutputStream bos1 = new ByteArrayOutputStream(5);
+			DataOutputStream outputStream = new DataOutputStream(bos1);
+			try {
+				outputStream.writeInt(skill);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Packet250CustomPayload packet = new Packet250CustomPayload();
+			packet.channel = "RPGLEVEL";
+			packet.data = bos1.toByteArray();
+			packet.length = bos1.size();
+			PacketDispatcher.sendPacketToServer(packet);
+		}
+			flag = true;
 	}
 
 	@Override
